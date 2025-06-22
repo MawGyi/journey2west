@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Collection</title>
+    <link rel="stylesheet" href="src/movie_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 My Movie Collection</h1>
+        <div class="movie-count" id="movieCount">Showing 6 of 6 movies</div>
+        <input type="text" class="search-box" placeholder="Search movies by name, genre, or actor...">
+        <div class="filter-buttons">
+    <button class="filter-btn" data-genre="all">All</button>
+    <button class="filter-btn" data-genre="Action">Action</button>
+    <button class="filter-btn" data-genre="Drama">Drama</button>
+    <button class="filter-btn" data-genre="Fantasy">Fantasy</button>
+    <button class="filter-btn" data-genre="Sci-Fi">Sci-Fi</button>
+</div>
+        <button class="clear-btn">Clear Search</button>
+        <div class="movie-grid" id="movieGrid">
+            <!-- Movies will appear here -->
+        </div>
+    </div>
+    <script>
+        const movies = [
+    { name: "John Wick", genre: "Action", actor: "Keanu Reeves", year: 2014 },
+    { name: "Pirate of Caribbean", genre: "Action", actor: "Johnny Depp", year: 2003 },
+    { name: "Angels", genre: "Drama", actor: "Denzel Washington", year: 2016 },
+    { name: "Harry Potter", genre: "Fantasy", actor: "Daniel Radcliffe", year: 2001 },
+    { name: "The Matrix", genre: "Sci-Fi", actor: "Keanu Reeves", year: 1999 },
+    { name: "Inception", genre: "Sci-Fi", actor: "Leonardo DiCaprio", year: 2010 }
+];
+// Get Dom elements
+const movieGrid = document.getElementById('movieGrid');
+const searchBox = document.querySelector('.search-box');
+
+// Function to cerate movie cards
+function createMovieCard(movie) {
+return `    
+        <div class="movie-card">
+        <div class="movie-title">${movie.name}</div>
+        <div class="movie-details">
+            <div><strong>Genre:</strong> ${movie.genre}</div>
+            <div><strong>Actor:</strong> ${movie.actor}</div>
+            <div><strong>Year:</strong> ${movie.year}</div>
+            </div>
+`;   
+}
+// Function to display all movies
+function displayMovies(movieList) {
+    movieGrid.innerHTML = movieList
+        .map(movie => createMovieCard(movie))
+        .join('');
+    
+    // Update counter
+    const counter = document.getElementById('movieCount');
+    counter.textContent = `Showing ${movieList.length} of ${movies.length} movies`;
+}
+
+// Display all movies
+displayMovies(movies);
+
+// Search functionality
+searchBox.addEventListener('input',(e) => {
+ const searchTerm = e.target.value.toLowerCase();
+ const filteredMovies = movies.filter(movie => 
+        movie.name.toLowerCase().includes(searchTerm) ||
+        movie.genre.toLowerCase().includes(searchTerm) ||
+        movie.actor.toLowerCase().includes(searchTerm) ||
+        movie.year.toString().includes(searchTerm)
+    );
+    displayMovies(filteredMovies);
+})
+
+// Filter functionality
+const filterButtons = document.querySelectorAll('.filter-btn');
+
+filterButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        // Remove 'active' from all buttons
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        // Add 'active' to clicked button
+        e.target.classList.add('active');
+
+        const genre = e.target.dataset.genre;
+        let filteredMovies;
+        if (genre === 'all') {
+            filteredMovies = movies;
+        } else {
+            filteredMovies = movies.filter(movie => movie.genre === genre);
+        }
+        displayMovies(filteredMovies);
+    });
+});
+
+// Set 'All' as active on load
+document.querySelector('.filter-btn[data-genre="all"]').classList.add('active');
+
+// Clear search functionality
+const clearBtn = document.querySelector('.clear-btn');
+clearBtn.addEventListener('click', () => {
+    searchBox.value = '';  // Clear the input
+    displayMovies(movies);  // Show all movies
+
+    // Remove 'active' from all genre buttons and set 'All' as active
+    filterButtons.forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.filter-btn[data-genre="all"]').classList.add('active');
+});
+
+// add some interactivity - click counter
+let clickCount = 0;
+movieGrid.addEventListener('click', (e) => {
+    if(e.target.closest('.movie-card')) {
+        clickCount++;
+        const movieTitle = e.target.closest('.movie-card').querySelector('.movie-title').textContent;
+        console.log(`You clicked on "${movieTitle}" - Total clicks: ${clickCount}`);
+    }   
+});
+    
+    </script>
+</body>
+</html>
