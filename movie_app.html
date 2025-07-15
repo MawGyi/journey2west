@@ -11,8 +11,13 @@
 <body>
     <div class="container">
         <!-- Header -->
+        <header class="app-header">
+            <span class="logo">🎬</span>
+            <span class="app-title">Moviepedia</span>
+        </header>
+
         <div class="header">
-            <h1>🎬 My Movie Collection</h1>
+
             <div class="movie-counter" id="movieCounter">
                 Showing 6 of 6 movies
             </div>
@@ -34,197 +39,29 @@
                 <button class="filter-btn" data-genre="comedy">Comedy</button>
             </div>
 
+            <div class="year-filter">
+                <label for="yearSelect">Year:</label>
+                <select id="yearSelect">
+                    <option value="all">All</option>
+                    <!-- Years will be populated by JS -->
+                </select>
+            </div>
+
             <button class="clear-btn" id="clearBtn">Clear Search</button>
         </div>
 
-        <!-- Movies Grid -->
-        <div class="movies-grid" id="moviesGrid">
-            <!-- Movies will be inserted here by JavaScript -->
-        </div>
-
-        <!-- Empty State -->
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <h3>No movies found</h3>
-            <p>Try adjusting your search or filter criteria</p>
-        </div>
+            <!-- Movies Grid -->
+    <div class="movies-grid" id="moviesGrid">
+        <!-- Movies will be inserted here by JavaScript -->
     </div>
 
-    <script>
-        // Sample movie data
-        const movies = [
-            {
-                title: "John Wick",
-                genre: "Action",
-                actor: "Keanu Reeves",
-                year: 2014
-            },
-            {
-                title: "Pirate of Caribbean",
-                genre: "Action",
-                actor: "Johnny Depp",
-                year: 2003
-            },
-            {
-                title: "The Matrix",
-                genre: "Sci-Fi",
-                actor: "Keanu Reeves",
-                year: 1999
-            },
-            {
-                title: "Lord of the Rings",
-                genre: "Fantasy",
-                actor: "Elijah Wood",
-                year: 2001
-            },
-            {
-                title: "The Godfather",
-                genre: "Drama",
-                actor: "Marlon Brando",
-                year: 1972
-            },
-            {
-                title: "Superbad",
-                genre: "Comedy",
-                actor: "Michael Cera",
-                year: 2007
-            }
-        ];
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+        <h3>No movies found</h3>
+        <p>Try adjusting your search or filter criteria</p>
+    </div>
+</div>
 
-        // DOM elements
-        const searchInput = document.getElementById('searchInput');
-        const moviesGrid = document.getElementById('moviesGrid');
-        const movieCounter = document.getElementById('movieCounter');
-        const clearBtn = document.getElementById('clearBtn');
-        const emptyState = document.getElementById('emptyState');
-        const filterBtns = document.querySelectorAll('.filter-btn');
-
-        let currentFilter = 'all';
-        let currentSearch = '';
-
-        // Initialize the app
-        function init() {
-            renderMovies();
-            setupEventListeners();
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Search input
-            searchInput.addEventListener('input', handleSearch);
-
-            // Clear button
-            clearBtn.addEventListener('click', clearSearch);
-
-            // Filter buttons
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', handleFilterClick);
-            });
-        }
-
-        // Handle search
-        function handleSearch(e) {
-            currentSearch = e.target.value.toLowerCase();
-            renderMovies();
-        }
-
-        // Handle filter clicks
-        function handleFilterClick(e) {
-            // Remove active class from all buttons
-            filterBtns.forEach(btn => btn.classList.remove('active'));
-
-            // Add active class to clicked button
-            e.target.classList.add('active');
-
-            // Update current filter
-            currentFilter = e.target.dataset.genre;
-
-            // Re-render movies
-            renderMovies();
-        }
-
-        // Clear search
-        function clearSearch() {
-            searchInput.value = '';
-            currentSearch = '';
-            currentFilter = 'all';
-
-            // Reset filter buttons
-            filterBtns.forEach(btn => btn.classList.remove('active'));
-            filterBtns[0].classList.add('active'); // Activate "All" button
-
-            renderMovies();
-        }
-
-        // Filter movies based on current criteria
-        function getFilteredMovies() {
-            return movies.filter(movie => {
-                // Genre filter
-                const genreMatch = currentFilter === 'all' ||
-                    movie.genre.toLowerCase() === currentFilter.toLowerCase();
-
-                // Search filter
-                const searchMatch = currentSearch === '' ||
-                    movie.title.toLowerCase().includes(currentSearch) ||
-                    movie.genre.toLowerCase().includes(currentSearch) ||
-                    movie.actor.toLowerCase().includes(currentSearch) ||
-                    movie.year.toString().includes(currentSearch);
-
-                return genreMatch && searchMatch;
-            });
-        }
-
-        // Create movie card HTML
-        function createMovieCard(movie) {
-            return `
-                <div class="movie-card">
-                    <div class="movie-content">
-                        <h3 class="movie-title">${movie.title}</h3>
-                        <div class="movie-info">
-                            <span class="movie-label">Genre:</span>
-                            <span class="movie-value">
-                                <span class="genre-tag">${movie.genre}</span>
-                            </span>
-                        </div>
-                        <div class="movie-info">
-                            <span class="movie-label">Actor:</span>
-                            <span class="movie-value">${movie.actor}</span>
-                        </div>
-                        <div class="movie-info">
-                            <span class="movie-label">Year:</span>
-                            <span class="movie-value">${movie.year}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Render movies
-        function renderMovies() {
-            const filteredMovies = getFilteredMovies();
-
-            // Update counter
-            movieCounter.textContent = `Showing ${filteredMovies.length} of ${movies.length} movies`;
-
-            // Handle empty state
-            if (filteredMovies.length === 0) {
-                moviesGrid.style.display = 'none';
-                emptyState.style.display = 'block';
-                return;
-            }
-
-            // Show movies grid
-            moviesGrid.style.display = 'grid';
-            emptyState.style.display = 'none';
-
-            // Render movie cards
-            moviesGrid.innerHTML = filteredMovies
-                .map(movie => createMovieCard(movie))
-                .join('');
-        }
-
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+<script src="src/app.js"></script>
 </body>
-
 </html>
